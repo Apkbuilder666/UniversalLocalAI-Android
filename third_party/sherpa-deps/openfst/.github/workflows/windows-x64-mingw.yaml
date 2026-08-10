@@ -1,0 +1,64 @@
+name: windows-x64-mingw
+
+on:
+  push:
+    branches:
+      - winport
+      - openfst-1.8.5
+
+  pull_request:
+    branches:
+      - winport
+      - openfst-1.8.5
+
+  workflow_dispatch:
+
+concurrency:
+  group: windows-x64-mingw-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows_x64_mingw:
+    name: Windows x64 (MinGW, ${{ matrix.build_type }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          cache: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+
+      - name: Configure CMake
+        run: |
+          cmake --version
+          gcc --version
+
+          cmake -S. -Bbuild -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_INSTALL_PREFIX="$PWD/build/install"
+
+      - name: Build openfst for Windows x64 (MinGW)
+        run: |
+          cmake --build build --parallel
+          cmake --build build --target install
+
+      - name: Verify install
+        run: |
+          ls -lh build/install/bin/fstinfo.exe

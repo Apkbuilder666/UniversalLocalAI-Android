@@ -1,0 +1,15 @@
+set(CPACK_PACKAGE_NAME "UniversalLocalAI")
+set(CPACK_PACKAGE_VENDOR "Universal Local AI")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_CONTACT "support@localhost.invalid")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+
+if(WIN32)
+    set(CPACK_GENERATOR ZIP)
+elseif(APPLE)
+    set(CPACK_GENERATOR DragNDrop)
+else()
+    set(CPACK_GENERATOR TGZ)
+endif()
+
+include(CPack)

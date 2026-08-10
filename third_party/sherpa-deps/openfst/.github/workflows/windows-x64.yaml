@@ -1,0 +1,49 @@
+name: windows-x64
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+concurrency:
+  group: windows-x64-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows_x64:
+    name: Windows x64
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        build_type: [Release, Debug]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake --version
+
+          mkdir build
+          cd build
+          cmake -A x64 -D CMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=./install ..
+
+      - name: Build openfst for Windows x64
+        shell: bash
+        run: |
+          cd build
+          cmake --build . --config ${{ matrix.build_type }} -- -m
+          cmake --build . --config ${{ matrix.build_type }} --target install -- -m
+
+          ls -lh ./bin/Release/sherpa-onnx.exe

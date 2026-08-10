@@ -1,0 +1,40 @@
+name: Build Windows x86-64
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          arch: win64_msvc2022_64
+          cache: true
+      - name: Configure
+        shell: pwsh
+        run: >-
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DLOCALAI_ENABLE_LLAMA=ON
+          -DLOCALAI_ENABLE_IMAGE_GENERATION=ON
+          -DLOCALAI_ENABLE_WHISPER=ON
+          -DLOCALAI_ENABLE_TTS=OFF
+      - name: Build and test
+        shell: pwsh
+        run: |
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure
+      - name: Install and deploy Qt
+        shell: pwsh
+        run: |
+          cmake --install build --prefix dist
+          windeployqt --release --no-translations dist/bin/localai-desktop.exe
+          Compress-Archive -Path dist/* -DestinationPath UniversalLocalAI-windows-x86_64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UniversalLocalAI-windows-x86_64
+          path: UniversalLocalAI-windows-x86_64.zip

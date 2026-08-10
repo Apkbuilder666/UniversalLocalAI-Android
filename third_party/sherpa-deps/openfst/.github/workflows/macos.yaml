@@ -1,0 +1,50 @@
+name: macos
+
+on:
+  push:
+    branches:
+      - winport
+      - openfst-1.8.5
+
+  pull_request:
+    branches:
+      - winport
+      - openfst-1.8.5
+
+  workflow_dispatch:
+
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    name: macOS (${{ matrix.build_type }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure CMake
+        run: |
+          cmake --version
+          clang++ --version
+
+          cmake -S. -Bbuild -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_INSTALL_PREFIX="$PWD/build/install"
+
+      - name: Build openfst for macOS
+        run: |
+          cmake --build build --parallel
+          cmake --build build --target install
+
+      - name: Verify install
+        run: |
+          ls -lh build/install/bin/fstinfo

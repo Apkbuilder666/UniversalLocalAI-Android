@@ -1,0 +1,35 @@
+name: Build Linux x86-64
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build qt6-base-dev qt6-multimedia-dev libgl1-mesa-dev libxkbcommon-dev
+      - name: Configure
+        run: >-
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DLOCALAI_ENABLE_LLAMA=ON
+          -DLOCALAI_ENABLE_IMAGE_GENERATION=ON
+          -DLOCALAI_ENABLE_WHISPER=ON
+          -DLOCALAI_ENABLE_TTS=OFF
+      - name: Build and test
+        run: |
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure
+      - name: Install portable tree
+        run: cmake --install build --prefix dist
+      - name: Package
+        run: tar -C dist -czf UniversalLocalAI-linux-x86_64.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UniversalLocalAI-linux-x86_64
+          path: UniversalLocalAI-linux-x86_64.tar.gz

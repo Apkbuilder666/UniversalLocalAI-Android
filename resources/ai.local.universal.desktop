@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Universal Local AI
+Exec=localai-desktop
+Icon=universal-local-ai
+Categories=Utility;Development;
+Terminal=false
