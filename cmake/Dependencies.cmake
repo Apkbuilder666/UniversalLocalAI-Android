@@ -2,6 +2,16 @@ include(FetchContent)
 
 set(FETCHCONTENT_QUIET OFF)
 
+if(ANDROID AND LOCALAI_ENABLE_VULKAN)
+    find_path(LOCALAI_VULKAN_HPP_SYSTEM_INCLUDE vulkan/vulkan.hpp
+        PATHS /usr/include NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
+    set(LOCALAI_VULKAN_HPP_INCLUDE "${CMAKE_BINARY_DIR}/localai-vulkan-headers")
+    file(MAKE_DIRECTORY "${LOCALAI_VULKAN_HPP_INCLUDE}")
+    file(COPY "${LOCALAI_VULKAN_HPP_SYSTEM_INCLUDE}/vulkan"
+        DESTINATION "${LOCALAI_VULKAN_HPP_INCLUDE}")
+    include_directories(SYSTEM "${LOCALAI_VULKAN_HPP_INCLUDE}")
+endif()
+
 if(LOCALAI_ENABLE_LLAMA)
     set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -64,7 +74,8 @@ if(LOCALAI_ENABLE_IMAGE_GENERATION)
             -DANDROID_ABI=${ANDROID_ABI}
             -DANDROID_PLATFORM=${ANDROID_PLATFORM}
             -DANDROID_STL=${ANDROID_STL}
-            -DSPIRV-Headers_DIR=/usr/share/cmake/SPIRV-Headers)
+            -DSPIRV-Headers_DIR=/usr/share/cmake/SPIRV-Headers
+            -DCMAKE_CXX_FLAGS=-isystem${LOCALAI_VULKAN_HPP_INCLUDE})
     endif()
     ExternalProject_Add(stable_diffusion_external
         ${SD_EXTERNAL_SOURCE_ARGS}
