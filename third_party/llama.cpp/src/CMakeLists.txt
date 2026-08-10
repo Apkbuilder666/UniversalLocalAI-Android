@@ -8,6 +8,14 @@ llama_add_compile_flags()
 
 file(GLOB LLAMA_MODELS_SOURCES "models/*.cpp")
 
+if(ANDROID)
+    # Android NDK Clang diagnoses the upstream DFlash template specializations
+    # as being instantiated before their definitions. DFlash is an optional
+    # draft-model architecture; excluding only that translation unit keeps all
+    # standard GGUF and multimodal model architectures available on Android.
+    list(FILTER LLAMA_MODELS_SOURCES EXCLUDE REGEX ".*/dflash\\.cpp$")
+endif()
+
 add_library(llama
             ../include/llama.h
             llama.cpp
