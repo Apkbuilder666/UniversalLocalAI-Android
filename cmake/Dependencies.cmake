@@ -59,9 +59,12 @@ if(LOCALAI_ENABLE_IMAGE_GENERATION)
     if(ANDROID)
         list(APPEND SD_PLATFORM_CMAKE_ARGS
             -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+            -DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}
+            -DANDROID_NDK=${CMAKE_ANDROID_NDK}
             -DANDROID_ABI=${ANDROID_ABI}
             -DANDROID_PLATFORM=${ANDROID_PLATFORM}
-            -DANDROID_STL=${ANDROID_STL})
+            -DANDROID_STL=${ANDROID_STL}
+            -DSPIRV-Headers_DIR=/usr/share/cmake/SPIRV-Headers)
     endif()
     ExternalProject_Add(stable_diffusion_external
         ${SD_EXTERNAL_SOURCE_ARGS}
