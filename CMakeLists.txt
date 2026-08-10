@@ -131,7 +131,6 @@ if(LOCALAI_BUILD_GUI)
         src/ui/main_window.cpp
         src/ui/main_window.hpp
     )
-    target_include_directories(localai-desktop PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(localai-desktop PRIVATE LocalAI::Core Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Multimedia)
     if(ANDROID)
         set_property(TARGET localai-desktop PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

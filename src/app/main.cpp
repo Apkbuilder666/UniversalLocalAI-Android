@@ -1,4 +1,4 @@
-#include "ui/main_window.hpp"
+#include "../ui/main_window.hpp"
 
 #include <QApplication>
 #include <QCoreApplication>
