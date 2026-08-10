@@ -81,7 +81,7 @@ if(LOCALAI_ENABLE_IMAGE_GENERATION)
             -DANDROID_PLATFORM=${ANDROID_PLATFORM}
             -DANDROID_STL=${ANDROID_STL}
             -DSPIRV-Headers_DIR=/usr/share/cmake/SPIRV-Headers
-            -DCMAKE_CXX_FLAGS=-isystem${LOCALAI_VULKAN_HPP_INCLUDE})
+            -DVulkan_INCLUDE_DIR=${LOCALAI_VULKAN_HPP_INCLUDE})
     endif()
     ExternalProject_Add(stable_diffusion_external
         ${SD_EXTERNAL_SOURCE_ARGS}

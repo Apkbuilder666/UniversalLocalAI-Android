@@ -125,6 +125,9 @@ endif()
 
 if(LOCALAI_BUILD_GUI)
     find_package(Qt6 6.4 REQUIRED COMPONENTS Core Gui Widgets Multimedia)
+    if(ANDROID AND Qt6_VERSION VERSION_GREATER_EQUAL 6.8)
+        qt_policy(SET QTP0002 NEW)
+    endif()
     qt_standard_project_setup()
     qt_add_executable(localai-desktop
         src/app/main.cpp
