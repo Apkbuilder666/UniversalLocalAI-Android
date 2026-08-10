@@ -171,11 +171,15 @@ if(LOCALAI_ENABLE_LITERT)
     if(ANDROID)
         set(LOCALAI_LITERT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/android/litert"
             CACHE PATH "LiteRT Android SDK root")
+        set(LITERT_INCLUDE_DIR "${LOCALAI_LITERT_ROOT}/include")
+        if(NOT EXISTS "${LITERT_INCLUDE_DIR}/tensorflow/lite/c/c_api.h")
+            message(FATAL_ERROR "The bundled LiteRT C API headers were not found under ${LITERT_INCLUDE_DIR}")
+        endif()
     else()
         set(LOCALAI_LITERT_ROOT "" CACHE PATH "LiteRT/TFLite native SDK root")
+        find_path(LITERT_INCLUDE_DIR tensorflow/lite/c/c_api.h
+            HINTS "${LOCALAI_LITERT_ROOT}" PATH_SUFFIXES include REQUIRED)
     endif()
-    find_path(LITERT_INCLUDE_DIR tensorflow/lite/c/c_api.h
-        HINTS "${LOCALAI_LITERT_ROOT}" PATH_SUFFIXES include REQUIRED)
     if(ANDROID)
         set(LITERT_LIBRARY "${LOCALAI_LITERT_ROOT}/lib/${ANDROID_ABI}/libtensorflowlite_jni.so")
         set(LITERT_GPU_LIBRARY "${LOCALAI_LITERT_ROOT}/lib/${ANDROID_ABI}/libtensorflowlite_gpu_jni.so")
